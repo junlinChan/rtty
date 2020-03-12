@@ -79,6 +79,8 @@ static void del_tty_session(struct tty_session *tty)
     uwsc_log_info("Del session: %d\n", tty->sid);
 
     free(tty);
+    if(auto_close)
+        ev_break (rtty->loop, EVBREAK_ALL);
 }
 
 static inline struct tty_session *find_tty_session(int sid)
@@ -353,6 +355,7 @@ static void usage(const char *prog)
         "      -k keepalive # keep alive in seconds for this client. Defaults to 5\n"
         "      -V           # Show version\n"
         "      -D           # Run in the background\n"
+        "      -e                       Exit when page is closed\n"
         "      -R           # Receive file\n"
         "      -S file      # Send file\n"
         "      -t token     # Authorization token\n"
@@ -371,10 +374,11 @@ int main(int argc, char **argv)
     int port = 5912;
     char *description = NULL;
     bool background = false;
+    bool auto_close = false;
     bool verbose = false;
     bool ssl = false;
 
-    while ((opt = getopt(argc, argv, "i:h:p:I:avd:sk:VDRS:t:")) != -1) {
+    while ((opt = getopt(argc, argv, "i:h:p:I:avd:sk:VDRSe:t:")) != -1) {
         switch (opt) {
         case 'i':
             if (get_iface_mac(optarg, mac, sizeof(mac)) < 0) {
@@ -420,6 +424,9 @@ int main(int argc, char **argv)
             break;
         case 'D':
             background = true;
+            break;
+        case 'e':
+            auto_close = true;
             break;
         case 'R':
             transfer_file(NULL);

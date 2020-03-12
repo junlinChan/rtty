@@ -106,7 +106,7 @@ git clone https://github.com/zhaojh329/libuwsc.git || {
 
 sleep 2
 
-git clone https://github.com/zhaojh329/rtty.git || {
+git clone https://github.com/junlinChan/rtty.git || {
 	echo "Clone rtty failed"
 	exit 1
 }
