@@ -58,6 +58,7 @@ static char login[128];       /* /bin/login */
 static char server_url[512];
 static char extra_header[128];  /* authorization token */
 static bool auto_reconnect;
+static bool auto_close;
 static int keepalive = 5;       /* second */
 static struct ev_timer reconnect_timer;
 static struct tty_session *sessions[RTTY_MAX_SESSIONS + 1];
@@ -80,7 +81,7 @@ static void del_tty_session(struct tty_session *tty)
 
     free(tty);
     if(auto_close)
-        ev_break (rtty->loop, EVBREAK_ALL);
+        ev_break (tty->loop, EVBREAK_ALL);
 }
 
 static inline struct tty_session *find_tty_session(int sid)
@@ -352,10 +353,10 @@ static void usage(const char *prog)
         "      -v           # verbose\n"
         "      -d           # Adding a description to the device(Maximum 126 bytes)\n"
         "      -s           # SSL on\n"
+        "      -e                       Exit when page is closed\n"
         "      -k keepalive # keep alive in seconds for this client. Defaults to 5\n"
         "      -V           # Show version\n"
         "      -D           # Run in the background\n"
-        "      -e                       Exit when page is closed\n"
         "      -R           # Receive file\n"
         "      -S file      # Send file\n"
         "      -t token     # Authorization token\n"
@@ -374,11 +375,10 @@ int main(int argc, char **argv)
     int port = 5912;
     char *description = NULL;
     bool background = false;
-    bool auto_close = false;
     bool verbose = false;
     bool ssl = false;
 
-    while ((opt = getopt(argc, argv, "i:h:p:I:avd:sk:VDRSe:t:")) != -1) {
+    while ((opt = getopt(argc, argv, "i:h:p:I:avde:sk:VDRS:t:")) != -1) {
         switch (opt) {
         case 'i':
             if (get_iface_mac(optarg, mac, sizeof(mac)) < 0) {
@@ -396,6 +396,9 @@ int main(int argc, char **argv)
             break;
         case 'a':
             auto_reconnect = true;
+            break;
+        case 'e':
+            auto_close = true;
             break;
         case 'v':
             verbose = true;
@@ -424,9 +427,6 @@ int main(int argc, char **argv)
             break;
         case 'D':
             background = true;
-            break;
-        case 'e':
-            auto_close = true;
             break;
         case 'R':
             transfer_file(NULL);
