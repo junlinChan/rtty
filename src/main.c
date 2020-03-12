@@ -67,6 +67,7 @@ static void usage(const char *prog)
                     "      -d, --description=string Adding a description to the device(Maximum 126 bytes)\n"
                     "      -a                       Auto reconnect to the server\n"
                     "      -s                       SSL on\n"
+                    "      -e                       Exit when page is closed\n"
                     "      -D                       Run in the background\n"
                     "      -t, --token=string       Authorization token\n"
                     "      -f username              Skip a second login authentication. See man login(1) about the details\n"
@@ -96,7 +97,7 @@ int main(int argc, char **argv)
     int c;
 
     while (true) {
-        c = getopt_long(argc, argv, "I:h:p:d:asDt:f:RS:vV", long_options, &option_index);
+        c = getopt_long(argc, argv, "I:h:p:d:asDte:f:RS:vV", long_options, &option_index);
         if (c == -1)
             break;
 
@@ -131,6 +132,9 @@ int main(int argc, char **argv)
                 break;
             case 'f':
                 rtty.username = optarg;
+                break;
+            case 'e':
+                rtty.auto_close = true;
                 break;
             case 'R':
                 download_file();

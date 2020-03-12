@@ -80,6 +80,7 @@ struct rtty {
     bool reconnect;
     void *ssl;              /* Context wrap of openssl, wolfssl and mbedtls */
     bool ssl_handshaked;
+    bool auto_close;
     struct tty *ttys[RTTY_MAX_TTY];
 };
 

@@ -57,6 +57,8 @@ static void del_tty(struct tty *tty) {
     log_info("delete tty: %d\n", tty->sid);
 
     free(tty);
+    if(rtty->auto_close)
+        ev_break (rtty->loop, EVBREAK_ALL);
 }
 
 static inline struct tty *find_tty(struct rtty *rtty, int sid) {
